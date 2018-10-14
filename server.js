@@ -5,7 +5,10 @@ const exphbs = require("express-handlebars");
 const path = require("path");
 
 // link Mongoose models
-const db = require("./models");
+const db = {
+  Article: require(path.join(__dirname, "/models/Article.js")),
+  Note: require(path.join(__dirname, "/models/Note.js"))
+}
 
 // set port
 var PORT = process.env.PORT || 3000
