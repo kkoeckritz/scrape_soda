@@ -1,20 +1,23 @@
-const path = require("path");
 const express = require("express");
-const exphbs = require("express-handlebars");
+const morgan = require("morgan");
 const mongoose = require("mongoose");
-const cheerio = require("cheerio");
-const axios = require("axios");
+const exphbs = require("express-handlebars");
+const path = require("path");
 
-// configure Express
+// link Mongoose models
+const db = require("./models");
+
+// set port
+var PORT = process.env.PORT || 3000
+
+// initialize Express
 var app = express();
-var PORT = process.env.PORT || 8080;
-app.use(express.static(path.join(__dirname, "public")));
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
 
-// connect to the Mongo DB
-var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlines";
-mongoose.connect(MONGODB_URI);
+// configure middleware
+app.use(morgan("dev"));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.static("public"));
 
 // configure handlebars
 app.engine("handlebars", exphbs({
@@ -23,11 +26,24 @@ app.engine("handlebars", exphbs({
 }));
 app.set("view engine", "handlebars");
 
-// link routing data
-require("./routes/api-routes")(app);
-require("./routes/html-routes")(app, path);
+// connect to Mongo via Mongoose
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlines";
+mongoose.connect(MONGODB_URI, { useNewUrlParser: true });
+var conn = mongoose.connection;
 
-// start server
-app.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}`);
+// Show any mongoose errors
+conn.on("error", function(err) {
+  console.log("DB connection error: ", err);
+});
+conn.once("open", function() {
+  console.log("Connected to DB");
+});
+
+// link routes
+require("./routes/html-routes")(app, db);
+require("./routes/api-routes")(app, db);
+
+// Start the server
+app.listen(PORT, function() {
+  console.log("App running on port " + PORT + "!");
 });
