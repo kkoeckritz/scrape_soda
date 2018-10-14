@@ -5,7 +5,7 @@ const exphbs = require("express-handlebars");
 const path = require("path");
 
 // link Mongoose models
-const db = {
+var db = {
   Article: require(path.join(__dirname, "/models/Article.js")),
   Note: require(path.join(__dirname, "/models/Note.js"))
 }
