@@ -6,8 +6,8 @@ const path = require("path");
 
 // link Mongoose models
 var db = {
-  Article: require(path.join(__dirname, "/models/Article.js")),
-  Note: require(path.join(__dirname, "/models/Note.js"))
+  Article: require(path.join(__dirname, "/models/article.js")),
+  Note: require(path.join(__dirname, "/models/note.js"))
 }
 
 // set port
